@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import static com.springboot.blog.utils.AppConstants.*;
 
 @RestController
 @RequestMapping("/api/posts")
@@ -27,10 +27,10 @@ public class PostController {
 
     @GetMapping
     public PostResponse getAllPosts(
-            @RequestParam(name = "pageNo",defaultValue = "0",required = false)int pageNo,
-            @RequestParam(name = "pageSize",defaultValue = "10",required = false)int pageSize,
-            @RequestParam(name = "sortBy",defaultValue = "id",required = false)String sortBy,
-            @RequestParam(name = "orderBy",defaultValue = "ASC",required = false)String orderBy
+            @RequestParam(name = "pageNo",defaultValue = PAGE_NO_DEFAULT_VALUE,required = false)int pageNo,
+            @RequestParam(name = "pageSize",defaultValue = PAGE_SIZE_DEFAULT_VALUE,required = false)int pageSize,
+            @RequestParam(name = "sortBy",defaultValue =SORT_BY_DEFAULT_VALUE,required = false)String sortBy,
+            @RequestParam(name = "orderBy",defaultValue = ORDER_BY_DEFAULT_VALUE,required = false)String orderBy
             ){
         return postService.getAllPosts(pageNo, pageSize,sortBy,orderBy);
     }
