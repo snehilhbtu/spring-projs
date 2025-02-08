@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 @Service
 public class PostServiceImpl implements PostService {
 
-    private PostRepository postRepository;
+    private final PostRepository postRepository;
 
     public PostServiceImpl(PostRepository postRepository) {
         this.postRepository = postRepository;
@@ -28,28 +28,28 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public PostDto createPost(PostDto postDto) {
-        Post newPost=postRepository.save(PostMapper.toPost(postDto));
+        Post newPost = postRepository.save(PostMapper.toPost(postDto));
 
-        PostDto responsePost=PostMapper.toPostDto(newPost);
+        PostDto responsePost = PostMapper.toPostDto(newPost);
 
-        return  responsePost;
+        return responsePost;
     }
 
     @Override
-    public PostResponse getAllPosts(int pageNo, int pageSize,String sortBy,String orderBy) {
+    public PostResponse getAllPosts(int pageNo, int pageSize, String sortBy, String orderBy) {
 
         //making a sort object based on sortBy and orderBy to pass in pageable
 
-        Sort sort=orderBy.equalsIgnoreCase(Sort.Direction.ASC.name())?Sort.by(sortBy).ascending():Sort.by(sortBy).descending();
+        Sort sort = orderBy.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
 
         //feature function
-        Pageable pageable=PageRequest.of(pageNo,pageSize,sort);
+        Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
 
-        Page<Post> pages=postRepository.findAll(pageable);
+        Page<Post> pages = postRepository.findAll(pageable);
 
-        List<Post> postList=pages.getContent();
+        List<Post> postList = pages.getContent();
 
-        PostResponse postResponse=new PostResponse();
+        PostResponse postResponse = new PostResponse();
         postResponse.setContent(postList.stream().map((post -> PostMapper.toPostDto(post))).collect(Collectors.toList()));
         postResponse.setPageNo(pages.getNumber());
         postResponse.setPageSize(pages.getSize());
@@ -64,20 +64,20 @@ public class PostServiceImpl implements PostService {
     @Override
     public PostDto getPostById(long id) {
 
-        Post post=postRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("post","id",id));
+        Post post = postRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("post", "id", id));
 
         return PostMapper.toPostDto(post);
     }
 
     @Override
     public PostDto updatePost(PostDto postDto, long id) {
-        Post post=postRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("post","id",id));
+        Post post = postRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("post", "id", id));
 
         post.setTitle(postDto.getTitle());
         post.setContent(postDto.getContent());
         post.setDescription(postDto.getDescription());
 
-        Post updatedPost=postRepository.save(post);
+        Post updatedPost = postRepository.save(post);
 
         return PostMapper.toPostDto(updatedPost);
 
@@ -85,7 +85,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public void deletePost(long id) {
-        Post post=postRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("post","id",id));
+        Post post = postRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("post", "id", id));
 
         postRepository.delete(post);
 

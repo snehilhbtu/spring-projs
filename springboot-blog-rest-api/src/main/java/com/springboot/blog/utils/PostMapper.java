@@ -1,6 +1,8 @@
 package com.springboot.blog.utils;
 
+import com.springboot.blog.dto.CommentDto;
 import com.springboot.blog.dto.PostDto;
+import com.springboot.blog.entity.Comment;
 import com.springboot.blog.entity.Post;
 
 public class PostMapper {
@@ -29,5 +31,28 @@ public class PostMapper {
 
         return post;
     }
+
+    //comment --> commetDto
+    public static CommentDto toCommentDto(Comment comment){
+        CommentDto commentDto=new CommentDto();
+        commentDto.setId(comment.getId());
+        commentDto.setBody(comment.getBody());
+        commentDto.setEmail(comment.getEmail());
+        commentDto.setName(comment.getName());
+
+        return commentDto;
+    }
+
+    //commentDto --> comment
+    public static Comment toComment(CommentDto commentDto){
+        Comment comment=new Comment();
+        comment.setId(commentDto.getId());
+        comment.setBody(commentDto.getBody());
+        comment.setEmail(commentDto.getEmail());
+        comment.setName(commentDto.getName());
+
+        return comment;
+    }
+
 
 }

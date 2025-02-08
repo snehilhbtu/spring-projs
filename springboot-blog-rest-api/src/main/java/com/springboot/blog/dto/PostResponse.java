@@ -11,7 +11,8 @@ public class PostResponse {
     private int totalPages;
     private boolean last;
 
-    public PostResponse(){}
+    public PostResponse() {
+    }
 
     public PostResponse(List<PostDto> content, int pageNo, int pageSize, Long totalElement, int totalPages, boolean last) {
         this.content = content;
@@ -69,7 +70,6 @@ public class PostResponse {
     public void setLast(boolean last) {
         this.last = last;
     }
-
 
 
 }
