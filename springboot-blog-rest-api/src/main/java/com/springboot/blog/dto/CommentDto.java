@@ -5,6 +5,8 @@ public class CommentDto {
 
     private long id;
     private String body;
+    private String email;
+    private String name;
 
     public long getId() {
         return id;
@@ -38,7 +40,6 @@ public class CommentDto {
         this.name = name;
     }
 
-    private String email;
-    private String name;
+
 
 }
