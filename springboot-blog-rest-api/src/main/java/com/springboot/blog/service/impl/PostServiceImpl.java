@@ -2,8 +2,10 @@ package com.springboot.blog.service.impl;
 
 import com.springboot.blog.dto.PostDto;
 import com.springboot.blog.dto.PostResponse;
+import com.springboot.blog.entity.Comment;
 import com.springboot.blog.entity.Post;
 import com.springboot.blog.exception.ResourceNotFoundException;
+import com.springboot.blog.repository.CommentRepository;
 import com.springboot.blog.repository.PostRepository;
 import com.springboot.blog.service.PostService;
 import com.springboot.blog.utils.PostMapper;
@@ -13,16 +15,20 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
+    private final CommentRepository commentRepository;
 
-    public PostServiceImpl(PostRepository postRepository) {
+    public PostServiceImpl(PostRepository postRepository,CommentRepository commentRepository) {
         this.postRepository = postRepository;
+        this.commentRepository=commentRepository;
     }
 
 
@@ -49,13 +55,15 @@ public class PostServiceImpl implements PostService {
 
         List<Post> postList = pages.getContent();
 
+
         PostResponse postResponse = new PostResponse();
-        postResponse.setContent(postList.stream().map((post -> PostMapper.toPostDto(post))).collect(Collectors.toList()));
+        postResponse.setContent(postList.stream().map(PostMapper::toPostDto).collect(Collectors.toList()));
         postResponse.setPageNo(pages.getNumber());
         postResponse.setPageSize(pages.getSize());
         postResponse.setTotalPages(pages.getTotalPages());
         postResponse.setTotalElement(pages.getTotalElements());
         postResponse.setLast(pages.isLast());
+
 
         return postResponse;
     }

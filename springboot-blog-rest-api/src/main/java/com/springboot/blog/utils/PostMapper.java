@@ -8,31 +8,38 @@ import com.springboot.blog.entity.Post;
 public class PostMapper {
 
     //post --> postDto
-
+    //while calling post to postDto we have to include comments inside posts
     public static PostDto toPostDto(Post post){
         PostDto postDto=new PostDto();
         postDto.setId(post.getId());
         postDto.setTitle(post.getTitle());
         postDto.setContent(post.getContent());
         postDto.setDescription(post.getDescription());
-
+        postDto.setComments(post.getComments());
         return postDto;
 
     }
 
 
     //postDto --> post
+
+
+    /*You should not include setComments in toPost(PostDto postDto)
+    since comments are managed separately via dedicated APIs and are not part of the PostDto request body.
+    Setting post.setComments(postDto.getComments())
+    risks unintentionally removing existing comments, especially with cascade = CascadeType.ALL, orphanRemoval = true.
+    To prevent data loss, toPost(PostDto postDto) should exclude comments,
+    while toPostDto(Post post) may include them for read operations, ensuring comments are handled independently.*/
     public static Post toPost(PostDto postDto){
         Post post=new Post();
         post.setId(postDto.getId());
         post.setTitle(postDto.getTitle());
         post.setContent(postDto.getContent());
         post.setDescription(postDto.getDescription());
-
         return post;
     }
 
-    //comment --> commetDto
+    //comment --> commentDto
     public static CommentDto toCommentDto(Comment comment){
         CommentDto commentDto=new CommentDto();
         commentDto.setId(comment.getId());

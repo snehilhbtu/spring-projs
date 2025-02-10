@@ -1,7 +1,11 @@
 package com.springboot.blog.dto;
 
 import java.util.List;
-
+/*
+* this response is designed to have page related data, like numbber,size,etc
+* including postsdata list
+*
+* */
 public class PostResponse {
 
     private List<PostDto> content;

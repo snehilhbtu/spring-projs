@@ -1,11 +1,24 @@
 package com.springboot.blog.dto;
 
+import com.springboot.blog.entity.Comment;
 
-
+import java.util.Set;
 
 public class PostDto {
     private Long id;
     private String title;
+    private String description;
+    private String content;
+
+    private Set<Comment> comments;
+
+    public Set<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(Set<Comment> comments) {
+        this.comments = comments;
+    }
 
     public Long getId() {
         return id;
@@ -39,7 +52,5 @@ public class PostDto {
         this.content = content;
     }
 
-    private String description;
-    private String content;
 
 }

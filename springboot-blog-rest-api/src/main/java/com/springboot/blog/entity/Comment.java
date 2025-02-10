@@ -1,5 +1,7 @@
 package com.springboot.blog.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.Objects;
@@ -23,6 +25,8 @@ public class Comment {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id", nullable = false)
+    //@JsonBackReference // Marks this as the "child" side
+    @JsonIgnore // Ignores the post field during serialization
     private Post post;
 
 
@@ -31,12 +35,12 @@ public class Comment {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Comment comment)) return false;
-        return id == comment.id && Objects.equals(body, comment.body) && Objects.equals(email, comment.email) && Objects.equals(name, comment.name) && Objects.equals(post, comment.post);
+        return id == comment.id; // Use only the ID for equality
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, body, email, name, post);
+        return Objects.hash(id); // Use only the ID for hashing
     }
 
 
@@ -111,3 +115,13 @@ public class Comment {
 
 
 }
+
+/*
+
+Immutable objects, with unchangeable states after creation, ensure thread safety and stable hash codes,
+crucial for hash-based collections like HashMap. Avoid mutable fields in hashCode and equals to prevent inconsistent behavior.
+Use immutable fields, synchronize access, or opt for thread-safe collections in multi-threaded environments.
+Properly implement hashCode, equals, and toString for predictable object behavior.
+
+* @Data gives getter and setter, toString ,equals, hashCode object, Constructor for @NotNull fields
+* */
