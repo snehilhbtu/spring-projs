@@ -5,6 +5,10 @@ import com.springboot.blog.dto.PostDto;
 import com.springboot.blog.entity.Comment;
 import com.springboot.blog.entity.Post;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+
 public class PostMapper {
 
     //post --> postDto
@@ -15,7 +19,7 @@ public class PostMapper {
         postDto.setTitle(post.getTitle());
         postDto.setContent(post.getContent());
         postDto.setDescription(post.getDescription());
-        postDto.setComments(post.getComments());
+        postDto.setComments(new HashSet<>(post.getComments().stream().map(PostMapper::toCommentDto).toList()));
         return postDto;
 
     }

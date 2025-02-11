@@ -26,7 +26,7 @@ public class Comment {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id", nullable = false)
     //@JsonBackReference // Marks this as the "child" side
-    @JsonIgnore // Ignores the post field during serialization
+    //@JsonIgnore // Ignores the post field during serialization
     private Post post;
 
 

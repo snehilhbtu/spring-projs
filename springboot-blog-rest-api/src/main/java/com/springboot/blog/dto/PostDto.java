@@ -10,15 +10,16 @@ public class PostDto {
     private String description;
     private String content;
 
-    private Set<Comment> comments;
-
-    public Set<Comment> getComments() {
+    public Set<CommentDto> getComments() {
         return comments;
     }
 
-    public void setComments(Set<Comment> comments) {
+    public void setComments(Set<CommentDto> comments) {
         this.comments = comments;
     }
+
+    private Set<CommentDto> comments;
+
 
     public Long getId() {
         return id;
