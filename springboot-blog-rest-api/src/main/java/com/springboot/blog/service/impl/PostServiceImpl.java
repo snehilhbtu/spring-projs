@@ -51,13 +51,13 @@ public class PostServiceImpl implements PostService {
         //feature function
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
 
+        //getting pages of post based on pageable
         Page<Post> pages = postRepository.findAll(pageable);
 
         List<Post> postList = pages.getContent();
 
-
         PostResponse postResponse = new PostResponse();
-        postResponse.setContent(postList.stream().map(PostMapper::toPostDto).collect(Collectors.toList()));
+        postResponse.setContent(postList.stream().map(PostMapper::toPostDto).toList());
         postResponse.setPageNo(pages.getNumber());
         postResponse.setPageSize(pages.getSize());
         postResponse.setTotalPages(pages.getTotalPages());

@@ -1,13 +1,22 @@
 package com.springboot.blog.dto;
 
-import com.springboot.blog.entity.Comment;
 
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 import java.util.Set;
 
 public class PostDto {
     private Long id;
+    @NotEmpty
+    @Size(min=2,message = "title must be more than 2 in length")
     private String title;
+
+    @NotEmpty
+    @Size(min=5,message = "description must be more than 5 in length")
     private String description;
+
+    @NotEmpty
+    @Size(min=10,message = "content must be more than 10 in length")
     private String content;
 
     public Set<CommentDto> getComments() {

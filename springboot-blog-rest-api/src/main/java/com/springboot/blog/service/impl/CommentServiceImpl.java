@@ -34,6 +34,7 @@ public class CommentServiceImpl implements CommentService {
         Post post=postRepository.findById(postId).orElseThrow(()->new ResourceNotFoundException("post","id",postId));
 
         Comment comment= PostMapper.toComment(commentDto);
+        //attaching post to comment
         comment.setPost(post);
 
         Comment newComment=commentRepository.save(comment);
