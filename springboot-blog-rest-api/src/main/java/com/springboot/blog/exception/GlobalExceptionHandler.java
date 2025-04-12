@@ -19,7 +19,7 @@ import java.util.HashMap;
 This whole class is just using a wrapper dto class to feed its exception data then send that class
 as response to the user (ErrorDetails) plus we have declared custom exceptions extending runtime exception also
 this class is also handling that
-exception thown -> this class catches -> feeds data to ErrorDetails --> sends this class with status code to the user
+exception thrown -> this class catches -> feeds data to ErrorDetails --> sends this class with status code to the user
  */
 //this tag means global exception handler
 @ControllerAdvice
