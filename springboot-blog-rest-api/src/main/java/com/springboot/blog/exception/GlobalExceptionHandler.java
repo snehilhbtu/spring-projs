@@ -13,10 +13,14 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import java.lang.reflect.Field;
 import java.util.Date;
 import java.util.HashMap;
-
+/*
+This whole class is just using a wrapper dto class to feed its exception data then send that class
+as response to the user (ErrorDetails) plus we have declared custom exceptions extending runtime exception also
+this class is also handling that
+exception thown -> this class catches -> feeds data to ErrorDetails --> sends this class with status code to the user
+ */
 //this tag means global exception handler
 @ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {

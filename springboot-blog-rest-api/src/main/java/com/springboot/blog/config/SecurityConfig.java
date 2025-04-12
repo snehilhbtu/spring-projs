@@ -67,3 +67,26 @@ public class SecurityConfig {
 
 
 }
+
+/*
+ * This security configuration sets up role-based access control using Spring Security.
+ *
+ * - Disables CSRF protection, which is suitable for stateless REST APIs (especially when not using browser-based forms).
+ * - Permits all users (authenticated or not) to perform GET requests to "/api/posts/**".
+ * - Requires authentication for any other type of request to any endpoint.
+ * - Uses HTTP Basic authentication to verify users via credentials in the request headers.
+ *
+ * Example configuration:
+ * - Restrict POST requests to "/api/posts/**" to users with the ADMIN role only.
+ * http
+ *     .csrf(csrf -> csrf.disable())
+ *     .authorizeHttpRequests(authorize -> authorize
+ *         .requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
+ *         .requestMatchers(HttpMethod.POST, "/api/posts/**").hasRole("ADMIN")
+ *         .anyRequest().authenticated()
+ *     )
+ *     .httpBasic(Customizer.withDefaults());
+ *
+ * This configuration uses Spring Security's lambda-based DSL and SecurityFilterChain bean
+ * for clean, declarative access control in a modern Spring Boot application.
+ */
