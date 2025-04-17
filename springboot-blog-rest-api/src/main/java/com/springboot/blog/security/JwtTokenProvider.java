@@ -19,10 +19,10 @@ import java.util.Date;
 @Component
 public class JwtTokenProvider {
 
-    @Value("${app.jwt-secret-key}")
+    @Value("${app.jwt-secret}")
     private String jwtSecret;
 
-    @Value("${app.jwt-expiration-milliseconds}")
+    @Value("${app-jwt-expiration-milliseconds}")
     private Long jwtExpirationDate;
 
     //generate JWT Token
@@ -30,13 +30,12 @@ public class JwtTokenProvider {
 
         String username= authentication.getName();
         Date currentDate=new Date();
-        Date expiryDate=new Date(currentDate.getTime()+jwtExpirationDate);
+        Date expireDate=new Date(currentDate.getTime()+jwtExpirationDate);
 
-        String token= Jwts
-                .builder()
+        String token= Jwts.builder()
                 .subject(username)
-                .issuedAt(currentDate)
-                .expiration(expiryDate)
+                .issuedAt(new Date())
+                .expiration(expireDate)
                 .signWith(key())
                 .compact();
 
@@ -74,6 +73,8 @@ public class JwtTokenProvider {
             throw new BlogApiException(HttpStatus.BAD_REQUEST, expiredJwtException.getMessage());
         }catch (UnsupportedJwtException unsupportedJwtException){
             throw new BlogApiException(HttpStatus.BAD_REQUEST, unsupportedJwtException.getMessage());
+        }catch (IllegalArgumentException illegalArgumentException){
+            throw new BlogApiException(HttpStatus.BAD_REQUEST, illegalArgumentException.getMessage());
         }
 
     }
