@@ -50,6 +50,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
+            //If valid, load the user and set Spring Security context:
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
         }

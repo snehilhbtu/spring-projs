@@ -127,3 +127,108 @@ public class SecurityConfig {
  * This configuration uses Spring Security's lambda-based DSL and SecurityFilterChain bean
  * for clean, declarative access control in a modern Spring Boot application.
  */
+
+/*
+==============================
+🌐 1. USER LOGIN REQUEST
+==============================
+Client sends credentials to:
+POST /api/auth/login
+Request Body: { username, password }
+
+      |
+      v
+
+==============================
+🧠 2. AuthController.logIn()
+==============================
+Delegates to AuthServiceImpl.login()
+-> Calls AuthenticationManager.authenticate()
+
+      |
+      v
+
+==============================
+🔍 3. AuthenticationManager
+==============================
+-> Internally uses:
+   CustomUserDetailsService.loadUserByUsername()
+-> Fetches user from DB
+-> Returns UserDetails (email, password, roles)
+
+      |
+      v
+
+==============================
+🔑 4. JwtTokenProvider.generateToken()
+==============================
+-> Creates JWT using:
+   - Subject (username)
+   - Issue time
+   - Expiry time
+   - Secret key
+-> Signs token and returns to controller
+
+      |
+      v
+
+==============================
+✅ 5. Controller Response
+==============================
+Returns:
+{
+  accessToken: "<JWT-TOKEN>",
+  tokenType: "Bearer"
+}
+
+Client stores this token locally.
+
+/*
+==============================
+🔁 6. Protected Request
+==============================
+Client → GET /api/posts
+Headers:
+Authorization: Bearer <JWT-TOKEN>
+
+      |
+      v
+
+==============================
+🧱 7. JwtAuthenticationFilter
+==============================
+Intercepts every request
+-> Extracts token from "Authorization" header
+
+      |
+      v
+
+==============================
+🔎 8. JwtTokenProvider.validateToken()
+==============================
+-> Validates structure, signature, expiry
+-> If valid, extracts username
+
+      |
+      v
+
+==============================
+👤 9. Load User Again
+==============================
+-> CustomUserDetailsService.loadUserByUsername()
+-> Get UserDetails + roles
+
+      |
+      v
+
+==============================
+🔐 10. Set Authentication
+==============================
+Creates:
+  UsernamePasswordAuthenticationToken
+Sets in:
+  SecurityContextHolder
+
+NOW the request is authenticated! ✅
+*/
+
