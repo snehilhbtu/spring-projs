@@ -68,7 +68,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize ->
                         //authorise only get requests, post for login/register
                         authorize
-                                .requestMatchers(HttpMethod.GET,"/api/posts/**").permitAll()
+                                .requestMatchers(HttpMethod.GET,"/api/**").permitAll()
                                 .requestMatchers("/api/auth/**").permitAll()
                                 .anyRequest().authenticated()
                 )

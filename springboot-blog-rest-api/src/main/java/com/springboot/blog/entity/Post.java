@@ -36,15 +36,21 @@ public class Post {
     //@JsonManagedReference //Marks this as the "parent" side
     Set<Comment> comments=new HashSet<Comment>();
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    //foreign key in post table for ref category
+    @JoinColumn(name="category_id")
+    private Category category;
+
     public Post(){}
 
 
-    public Post(Long id, String title, String description, String content,Set<Comment> comments) {
+    public Post(Long id, String title, String description, String content,Set<Comment> comments,Category category) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.content = content;
         this.comments = comments;
+        this.category=category;
     }
 
     @Override
@@ -102,7 +108,13 @@ public class Post {
         this.content = content;
     }
 
+    public Category getCategory() {
+        return category;
+    }
 
+    public void setCategory(Category category) {
+        this.category = category;
+    }
 
 
 }

@@ -2,23 +2,19 @@ package com.springboot.blog.service.impl;
 
 import com.springboot.blog.dto.PostDto;
 import com.springboot.blog.dto.PostResponse;
-import com.springboot.blog.entity.Comment;
 import com.springboot.blog.entity.Post;
 import com.springboot.blog.exception.ResourceNotFoundException;
 import com.springboot.blog.repository.CommentRepository;
 import com.springboot.blog.repository.PostRepository;
 import com.springboot.blog.service.PostService;
-import com.springboot.blog.utils.PostMapper;
+import com.springboot.blog.utils.BlogMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class PostServiceImpl implements PostService {
@@ -34,9 +30,9 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public PostDto createPost(PostDto postDto) {
-        Post newPost = postRepository.save(PostMapper.toPost(postDto));
+        Post newPost = postRepository.save(BlogMapper.toPost(postDto));
 
-        PostDto responsePost = PostMapper.toPostDto(newPost);
+        PostDto responsePost = BlogMapper.toPostDto(newPost);
 
         return responsePost;
     }
@@ -57,7 +53,7 @@ public class PostServiceImpl implements PostService {
         List<Post> postList = pages.getContent();
 
         PostResponse postResponse = new PostResponse();
-        postResponse.setContent(postList.stream().map(PostMapper::toPostDto).toList());
+        postResponse.setContent(postList.stream().map(BlogMapper::toPostDto).toList());
         postResponse.setPageNo(pages.getNumber());
         postResponse.setPageSize(pages.getSize());
         postResponse.setTotalPages(pages.getTotalPages());
@@ -74,7 +70,7 @@ public class PostServiceImpl implements PostService {
 
         Post post = postRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("post", "id", id));
 
-        return PostMapper.toPostDto(post);
+        return BlogMapper.toPostDto(post);
     }
 
     @Override
@@ -87,7 +83,7 @@ public class PostServiceImpl implements PostService {
 
         Post updatedPost = postRepository.save(post);
 
-        return PostMapper.toPostDto(updatedPost);
+        return BlogMapper.toPostDto(updatedPost);
 
     }
 

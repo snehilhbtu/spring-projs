@@ -8,12 +8,11 @@ import com.springboot.blog.exception.ResourceNotFoundException;
 import com.springboot.blog.repository.CommentRepository;
 import com.springboot.blog.repository.PostRepository;
 import com.springboot.blog.service.CommentService;
-import com.springboot.blog.utils.PostMapper;
+import com.springboot.blog.utils.BlogMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.springboot.blog.utils.AppConstants.COMMENT_AND_POST_DONT_RELATE;
 
@@ -33,13 +32,13 @@ public class CommentServiceImpl implements CommentService {
 
         Post post=postRepository.findById(postId).orElseThrow(()->new ResourceNotFoundException("post","id",postId));
 
-        Comment comment= PostMapper.toComment(commentDto);
+        Comment comment= BlogMapper.toComment(commentDto);
         //attaching post to comment
         comment.setPost(post);
 
         Comment newComment=commentRepository.save(comment);
 
-        return PostMapper.toCommentDto(newComment);
+        return BlogMapper.toCommentDto(newComment);
     }
 
     @Override
@@ -47,7 +46,7 @@ public class CommentServiceImpl implements CommentService {
 
         List<Comment> commentList=commentRepository.findAllByPostId(postId);
 
-        return commentList.stream().map(PostMapper::toCommentDto).toList();
+        return commentList.stream().map(BlogMapper::toCommentDto).toList();
 
     }
 
@@ -59,7 +58,7 @@ public class CommentServiceImpl implements CommentService {
         if(!doesCommentBelongsToPost(postId,commentId))
             throw new BlogApiException(HttpStatus.BAD_REQUEST,COMMENT_AND_POST_DONT_RELATE);
 
-        return PostMapper.toCommentDto(comment);
+        return BlogMapper.toCommentDto(comment);
     }
 
     @Override
@@ -74,7 +73,7 @@ public class CommentServiceImpl implements CommentService {
         comment.setEmail(updatedCommentDto.getEmail());
         comment.setBody(updatedCommentDto.getBody());
 
-        return PostMapper.toCommentDto(commentRepository.save(comment));
+        return BlogMapper.toCommentDto(commentRepository.save(comment));
     }
 
     @Override

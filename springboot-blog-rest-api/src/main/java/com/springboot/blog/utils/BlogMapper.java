@@ -1,15 +1,15 @@
 package com.springboot.blog.utils;
 
+import com.springboot.blog.dto.CategoryDto;
 import com.springboot.blog.dto.CommentDto;
 import com.springboot.blog.dto.PostDto;
+import com.springboot.blog.entity.Category;
 import com.springboot.blog.entity.Comment;
 import com.springboot.blog.entity.Post;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 
-public class PostMapper {
+public class BlogMapper {
 
     //post --> postDto
     //while calling post to postDto we have to include comments inside posts
@@ -19,7 +19,7 @@ public class PostMapper {
         postDto.setTitle(post.getTitle());
         postDto.setContent(post.getContent());
         postDto.setDescription(post.getDescription());
-        postDto.setComments(new HashSet<>(post.getComments().stream().map(PostMapper::toCommentDto).toList()));
+        postDto.setComments(new HashSet<>(post.getComments().stream().map(BlogMapper::toCommentDto).toList()));
         return postDto;
 
     }
@@ -63,6 +63,26 @@ public class PostMapper {
         comment.setName(commentDto.getName());
 
         return comment;
+    }
+
+    public static Category toCategory(CategoryDto categoryDto){
+        Category category=new Category();
+        category.setId(categoryDto.getId());
+        category.setName(categoryDto.getName());
+        category.setDescription(categoryDto.getDescription());
+
+        return category;
+
+    }
+
+    public static CategoryDto toCategoryDto(Category category){
+        CategoryDto categoryDto=new CategoryDto();
+        categoryDto.setId(category.getId());
+        categoryDto.setName(category.getName());
+        categoryDto.setDescription(category.getDescription());
+
+        return categoryDto;
+
     }
 
 
