@@ -66,7 +66,7 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorize ->
-                        //authorise only get requests
+                        //authorise only get requests, post for login/register
                         authorize
                                 .requestMatchers(HttpMethod.GET,"/api/posts/**").permitAll()
                                 .requestMatchers("/api/auth/**").permitAll()
@@ -79,10 +79,178 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 );
 
+        //this tells to add filter before
         http.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return  http.build();
     }
+/*
+         +--------------------+
+         |  Incoming Request  |
+         +--------------------+
+                   |
+                   v
+     +-------------------------------+
+     | SecurityFilterChain from Config|
+     +-------------------------------+
+                   |
+       ┌──────────────┬────────────────┐
+       ↓              ↓                ↓
+  Login Route     Public Route     Protected Route
+ (/api/auth/**)   (e.g. GET /posts)  (e.g. /api/data)
+       ↓              ↓                ↓
+Bypass JWT filter Permit All     → JwtAuthenticationFilter
+       ↓                              ↓
+AuthManager.authenticate()       Valid Token? → Yes → Set SecurityContext
+       ↓                                        ↓
+DaoAuthProvider                             → Controller
+       ↓
+LoadUserByUsername()
+       ↓
+PasswordEncoder.matches()
+       ↓
+Return JWT token (JWTAuthResponse)
+
+ */
+
+
+/*
+===========================================================================================
+🔐 SecurityConfig Class - Central Config for Spring Security (JWT Based)
+===========================================================================================
+
+🧠 WHAT IS THIS CLASS FOR?
+---------------------------
+This configures:
+✔️ How Spring Security handles requests
+✔️ Which routes are public vs protected
+✔️ How passwords are encoded
+✔️ How Spring handles unauthorized access
+✔️ Attaches custom JWT filter before Spring’s default filters
+
+===========================================================================================
+🔩 CLASS-LEVEL ANNOTATIONS:
+===========================================================================================
+
+@Configuration
+    → Tells Spring this is a configuration class.
+
+@EnableMethodSecurity
+    → Enables method-level security (@PreAuthorize, @PostAuthorize, etc.)
+
+===========================================================================================
+🧱 CONSTRUCTOR INJECTION:
+===========================================================================================
+
+This brings in:
+🔹 userDetailsService            → used by DaoAuthenticationProvider to load user
+🔹 authenticatcationEntryPoint  → sends 401 if unauthorized
+🔹 authenticationFilter         → custom JWT filter that checks for valid token
+
+===========================================================================================
+🔑 PASSWORD ENCODER BEAN:
+===========================================================================================
+
+@Bean
+public static PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
+}
+
+Why?
+🔐 It hashes passwords when saving a user
+🔁 It compares password hashes during login using:
+   ➤ passwordEncoder.matches(rawPassword, hashedPassword)
+
+===========================================================================================
+⚙️ AUTHENTICATION MANAGER:
+===========================================================================================
+
+@Bean
+public AuthenticationManager authenticationManager(AuthenticationConfiguration config)
+
+Why?
+🧠 Needed to manually call authenticationManager.authenticate()
+    → You do this in AuthServiceImpl during login
+
+===========================================================================================
+🔐 SECURITY FILTER CHAIN CONFIGURATION:
+===========================================================================================
+
+@Bean
+SecurityFilterChain securityFilterChain(HttpSecurity http)
+
+➡️ This is the MAIN method configuring Spring Security.
+Let’s break down what's happening 👇
+
+-----------------------------------------
+1. CSRF Disabled (for stateless REST API)
+-----------------------------------------
+http.csrf(csrf -> csrf.disable());
+
+-----------------------------------------
+2. Public Routes
+-----------------------------------------
+http.authorizeHttpRequests(authorize ->
+    authorize
+        .requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
+        .requestMatchers("/api/auth/**").permitAll()
+        .anyRequest().authenticated()
+);
+
+🧠 Meaning:
+- GET /api/posts/** → Public (no auth required)
+- /api/auth/** (login, signup) → Public
+- Everything else → Needs JWT token
+
+-----------------------------------------
+3. Custom Exception Handler
+-----------------------------------------
+http.exceptionHandling(exception ->
+    exception.authenticationEntryPoint(authenticatcationEntryPoint)
+);
+
+🛑 If user hits a protected route without JWT → 401 sent by `JwtAuthenticatcationEntryPoint`
+
+-----------------------------------------
+4. Session Management
+-----------------------------------------
+http.sessionManagement(session ->
+    session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+);
+
+💡 Why?
+➡️ Because we use **JWT**, not server sessions
+
+-----------------------------------------
+5. Add JWT Filter Before Spring's Default
+-----------------------------------------
+http.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
+🔥 This is CRITICAL:
+- `JwtAuthenticationFilter` checks Authorization header
+- Validates token, sets security context (like login)
+- Placed BEFORE Spring's UsernamePasswordAuthenticationFilter (which is for form-based login)
+
+-----------------------------------------
+6. Build and Return Security Chain
+-----------------------------------------
+return http.build();
+
+===========================================================================================
+📍 When and Where to Use this Class?
+===========================================================================================
+
+✅ ALWAYS needed in Spring Boot apps using:
+- JWT Token Authentication
+- Custom filters
+- Stateless APIs
+- Role-based or method-level auth (@PreAuthorize etc.)
+
+📦 Automatically loaded by Spring Boot as part of Component Scan
+
+===========================================================================================
+*/
+
 
     //  Define an in-memory user, not usable since using db auth
 //    @Bean
@@ -129,59 +297,112 @@ public class SecurityConfig {
  */
 
 /*
-==============================
-🌐 1. USER LOGIN REQUEST
-==============================
-Client sends credentials to:
+=======================================================================================
+🔐 JWT Authentication Flow in Spring Security - With Password Checking
+=======================================================================================
+
+🔁 STEP 1: CLIENT SENDS LOGIN REQUEST
+-------------------------------------
 POST /api/auth/login
-Request Body: { username, password }
-
-      |
-      v
-
-==============================
-🧠 2. AuthController.logIn()
-==============================
-Delegates to AuthServiceImpl.login()
--> Calls AuthenticationManager.authenticate()
-
-      |
-      v
-
-==============================
-🔍 3. AuthenticationManager
-==============================
--> Internally uses:
-   CustomUserDetailsService.loadUserByUsername()
--> Fetches user from DB
--> Returns UserDetails (email, password, roles)
-
-      |
-      v
-
-==============================
-🔑 4. JwtTokenProvider.generateToken()
-==============================
--> Creates JWT using:
-   - Subject (username)
-   - Issue time
-   - Expiry time
-   - Secret key
--> Signs token and returns to controller
-
-      |
-      v
-
-==============================
-✅ 5. Controller Response
-==============================
-Returns:
+Body:
 {
-  accessToken: "<JWT-TOKEN>",
-  tokenType: "Bearer"
+    "usernameOrEmail": "john@example.com",
+    "password": "123456"
 }
 
-Client stores this token locally.
+⬇️
+
+STEP 2: AuthController receives request and calls authService.login()
+----------------------------------------------------------------------
+
+AuthController.java
+--------------------
+@PostMapping("/login")
+public ResponseEntity<JWTAuthResponse> logIn(@RequestBody LoginDto loginDto) {
+    String token = authService.login(loginDto); // 🔥 triggers login flow
+    return ResponseEntity.ok(new JWTAuthResponse(token));
+}
+
+⬇️
+
+STEP 3: AuthServiceImpl.login() creates Authentication Token
+------------------------------------------------------------
+
+Authentication authentication = authenticationManager.authenticate(
+    new UsernamePasswordAuthenticationToken(
+        loginDto.getUsernameOrEmail(),
+        loginDto.getPassword()
+    )
+);
+
+⬇️
+
+STEP 4: AuthenticationManager triggers DaoAuthenticationProvider
+-----------------------------------------------------------------
+This is auto-wired behind the scenes. It uses:
+
+➡️ CustomUserDetailsService (your class)
+➡️ BCryptPasswordEncoder (your configured bean)
+
+⬇️
+
+STEP 5: DaoAuthenticationProvider does the heavy lifting:
+----------------------------------------------------------
+
+✔️ Calls your loadUserByUsername():
+------------------------------------
+CustomUserDetailsService.java
+-----------------------------
+UserDetails user = userRepository.findByUsernameOrEmail(...);
+
+✔️ Then checks the password:
+-----------------------------
+passwordEncoder.matches(rawPassword, encodedPasswordFromDB)
+
+Example:
+BCryptPasswordEncoder.matches("123456", "$2a$10$randomEncodedPassword")
+
+✅ If password matches → return Authenticated Authentication object
+❌ If not → throws BadCredentialsException
+
+⬇️
+
+STEP 6: AuthServiceImpl receives authenticated object and generates token
+--------------------------------------------------------------------------
+
+String token = jwtTokenProvider.generateToken(authentication);
+
+⬇️
+
+STEP 7: Controller returns JWT to client
+----------------------------------------
+
+{
+    "accessToken": "eyJhbGciOiJIUzI1NiIsInR...",
+    "tokenType": "Bearer"
+}
+
+=======================================================================================
+🔁 Summary:
+=======================================================================================
+
+1️⃣ UsernamePasswordAuthenticationToken → wraps raw login credentials
+2️⃣ authenticationManager → sends it to DaoAuthenticationProvider
+3️⃣ DaoAuthenticationProvider:
+    - Loads user from DB using CustomUserDetailsService
+    - Compares passwords using BCryptPasswordEncoder
+4️⃣ On success → returns authenticated Authentication object
+5️⃣ JwtTokenProvider → generates signed JWT with username
+6️⃣ Controller returns token to client
+
+=======================================================================================
+🔥 Bonus:
+- You configure the encoder in SecurityConfig:
+@Bean public static PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
+}
+
+*/
 
 /*
 ==============================

@@ -49,6 +49,12 @@ public class AuthServiceImpl implements AuthService {
         Authentication authentication= authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(login.getUsernameOrEmail(),
                 login.getPassword()));
 
+        /*
+        this above function calls
+        authManager --> DaoAuthProvider -->uses customUser class --> fetches user
+        --> provider uses Bcrypt pass inside security to validate password
+        */
+
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         String token= jwtTokenProvider.generateToken(authentication);
