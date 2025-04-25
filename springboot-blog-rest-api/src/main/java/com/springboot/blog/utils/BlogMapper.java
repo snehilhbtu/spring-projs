@@ -20,6 +20,7 @@ public class BlogMapper {
         postDto.setContent(post.getContent());
         postDto.setDescription(post.getDescription());
         postDto.setComments(new HashSet<>(post.getComments().stream().map(BlogMapper::toCommentDto).toList()));
+        postDto.setCategoryId(post.getCategory().getId());
         return postDto;
 
     }

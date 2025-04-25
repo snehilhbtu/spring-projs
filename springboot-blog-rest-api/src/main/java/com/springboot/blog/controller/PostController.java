@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.*;
 //must use jakarta for spring boot 3+
 import jakarta.validation.Valid;
 
+import java.util.List;
+
 import static com.springboot.blog.utils.AppConstants.*;
 
 @RestController
@@ -31,6 +33,13 @@ public class PostController {
             @RequestParam(name = "orderBy",defaultValue = ORDER_BY_DEFAULT_VALUE,required = false)String orderBy
             ){
         return postService.getAllPosts(pageNo, pageSize,sortBy,orderBy);
+    }
+
+    @GetMapping("/category/{id}")
+    public ResponseEntity<List<PostDto>> getAllPostsByCategoryId(@PathVariable("id") Long  categoryId){
+
+        return ResponseEntity.ok(postService.getPostsByCategoryId(categoryId));
+
     }
 
     @PostMapping

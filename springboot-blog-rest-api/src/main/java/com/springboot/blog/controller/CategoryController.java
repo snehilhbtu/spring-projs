@@ -34,17 +34,31 @@ public class CategoryController {
     public ResponseEntity<CategoryDto> getCategory(@PathVariable("id") Long categoryId){
 
         CategoryDto categoryDto=categoryService.getCategory(categoryId);
-
         return ResponseEntity.ok(categoryDto);
 
     }
 
     @GetMapping
-    public ResponseEntity<List<CategoryDto>> getCategory(){
+    public ResponseEntity<List<CategoryDto>> getAllCategory(){
 
         List<CategoryDto> categoryDtoList=categoryService.getAllCategories();
-
         return ResponseEntity.ok(categoryDtoList);
+
+    }
+
+    @PutMapping("{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<CategoryDto> updateCategory(@PathVariable("id") Long categoryId,@RequestBody CategoryDto categoryDto){
+
+        return ResponseEntity.ok(categoryService.updateCategory(categoryId,categoryDto));
+
+    }
+
+    @DeleteMapping("{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> deleteCategory(@PathVariable("id") Long categoryId){
+
+        return ResponseEntity.ok(categoryService.deleteCategory(categoryId));
 
     }
 

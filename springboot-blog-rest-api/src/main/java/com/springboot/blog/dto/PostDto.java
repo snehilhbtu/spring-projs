@@ -2,6 +2,7 @@ package com.springboot.blog.dto;
 
 
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.util.Set;
 
@@ -18,6 +19,20 @@ public class PostDto {
     @NotEmpty
     @Size(min=10,message = "content must be more than 10 in length")
     private String content;
+
+
+    @NotNull
+    private Long categoryId;
+
+
+
+    public Long getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(Long categoryId) {
+        this.categoryId = categoryId;
+    }
 
     public Set<CommentDto> getComments() {
         return comments;
