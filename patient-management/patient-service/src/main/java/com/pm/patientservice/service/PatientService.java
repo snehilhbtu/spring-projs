@@ -21,10 +21,8 @@ public class PatientService {
  //   private final BillingServiceGrpcClient billingServiceGrpcClient;
  //   private final KafkaProducer kafkaProducer;
 
-    public PatientService(PatientRepository patientRepository
-                         ) {
+    public PatientService(PatientRepository patientRepository) {
         this.patientRepository = patientRepository;
-
     }
 
     public List<PatientResponseDTO> getPatients() {
@@ -74,6 +72,8 @@ public class PatientService {
     }
 
     public void deletePatient(UUID id) {
+        if(!patientRepository.existsById(id))
+            throw new PatientNotFoundException("Patient with id "+id+" Not Found");
         patientRepository.deleteById(id);
     }
 }
